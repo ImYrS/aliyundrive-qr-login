@@ -1,0 +1,191 @@
+<!--
+=========================================================
+* Argon Dashboard 2 PRO - v2.0.1
+=========================================================
+
+* Product Page:  https://www.creative-tim.com/product/argon-dashboard-pro
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>阿里云盘登录</title>
+    <link href="/static/css/argon-dashboard.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="">
+<main class="main-content mt-0">
+    <div class="page-header min-vh-100"
+         style="background-image: url('/static/img/bg.jpg');">
+        <span class="mask bg-gradient-dark opacity-4"></span>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-7">
+                    <div class="card" id="main-card">
+                        <div class="card-body px-lg-5 py-lg-5 text-center">
+                            <div class="info mb-4">
+                                <div class="icon icon-shape icon-xl rounded-circle bg-gradient-info shadow text-center mx-auto">
+                                    <i class="fas fa-qrcode opacity-10"></i>
+                                </div>
+                            </div>
+                            <div class="text-center text-muted mb-4">
+                                <h2>阿里云盘</h2>
+                                <span class="text-muted">refresh token 获取工具</span>
+                            </div>
+                            <div class="row gx-2 gx-sm-3">
+                                <div id="login-qrcode" style="display: none;"></div>
+                                <div id="results" style="display: none;">
+                                    <div id="avatar" class="mb-2"></div>
+                                    <h5 id="nickname" class="mb-4"></h5>
+                                    <p class="text-start mb-0 text-muted text-sm">refresh token</p>
+                                    <div class="input-group mb-4" id="refresh-token-form">
+                                        <input type="text" class="form-control" readonly id="refresh-token"
+                                               aria-label="refresh token">
+                                        <button class="btn btn-outline-primary mb-0" id="clip-button"
+                                                data-clipboard-target="#refresh-token">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mb-4">
+                                <span class="text-muted text-sm" id="process-text"></span>
+                                <button class="btn btn-primary w-100" onclick="getLogin();" id="start-button">
+                                    点击扫码登录
+                                </button>
+                            </div>
+                            <p class="text-muted text-sm mb-n4">
+                                Powered By
+                                <a href="https://github.com/ImYrS/aliyun-auto-signin" target="_blank">
+                                    <i class="fab fa-github ms-1"></i> Aliyun Auto Signin
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<script src="/static/js/arale-qrcode.min.js"></script>
+<script>
+    const getLogin = () => {
+        $('#start-button').html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>').attr('disabled', true);
+        $.ajax({
+            url: '/api/login',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            success: (resp) => {
+                // 绘制登录二维码
+                let qrcode = new AraleQRCode({
+                    'text': resp['data']['content'],
+                    'size': 200,
+                    'correctLevel': 2,
+                    'foreground': '#344767'
+                });
+                $('#start-button').slideUp(250, () => {
+                    $('#login-qrcode').html(qrcode).slideDown();
+                    $('#process-text').text('请使用阿里云盘客户端扫描登录...');
+                });
+
+                sessionStorage.login_uuid = resp['data']['uuid'];
+
+                window.queryTimer = setInterval(queryLogin, 1000);
+            },
+            error: (resp) => {
+                let error = resp['responseJSON']['message'] || '未知错误.';
+                error += ' 请刷新页面重试.';
+                $('#process-text').text(error).addClass('text-danger').removeClass('text-muted');
+            }
+        });
+    }
+
+    const queryLogin = () => {
+        $.ajax({
+            url: '/api/login',
+            method: 'get',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            data: {'uuid': sessionStorage.login_uuid},
+            success: (resp) => {
+                let text = '';
+                let stop = false;
+                let slideUp = false;
+
+                if (resp['data']['state'] === 0) {
+                } else if (resp['data']['state'] === 10) {
+                    text = '扫描成功, 请确认登陆...';
+                    slideUp = true;
+                } else if (resp['data']['state'] === 20) {
+                    slideUp = true;
+                    stop = true;
+                    text = '登陆成功'
+
+                    $('#nickname').text(resp['data']['user']['username']);
+                    if (resp['data']['user']['avatar']) {
+                        $('#avatar').append(`<img src="${resp['data']['user']['avatar']}" alt="avatar" class="w-75 border-radius-xl shadow-sm mb-1">`);
+                    }
+
+                    $('#refresh-token').val(resp['data']['user']['refresh_token']);
+                    $('#results').slideDown();
+
+                } else if (resp['data']['state'] === 30) {
+                    slideUp = true;
+                    text = '二维码已过期, <a href="javascript:getLogin()" class="text-decoration-underline">点击刷新</a>';
+                } else if (resp['data']['state'] === 40) {
+                    stop = true;
+                    text = '登录被取消, <a href="javascript:getLogin()" class="text-decoration-underline">点击刷新</a>';
+                    slideUp = true;
+                }
+
+                if (text) $('#process-text').html(text);
+                if (stop) clearInterval(queryTimer);
+                if (slideUp) $('#login-qrcode').slideUp();
+            },
+            error: (resp) => XHRError(resp)
+        });
+    }
+
+    const initClipboard = () => {
+        window.clipboard = new ClipboardJS("#clip-button");
+        clipboard.on('success', (e) => {
+            e.clearSelection();
+            let button = $('#clip-button');
+            let icon = button.html();
+            button.html('<i class="fas fa-circle-check text-success">');
+
+            setTimeout(() => {
+                button.html(icon);
+            }, 1500);
+        });
+        clipboard.on('error', (e) => {
+            let button = $('#clip-button');
+            let icon = button.html();
+            button.html('<i class="fas fa-circle-xmark text-danger">');
+
+            setTimeout(() => {
+                button.html(icon);
+            }, 1500);
+        });
+    }
+
+    // getLogin();
+    initClipboard();
+</script>
+</body>
+
+</html>
