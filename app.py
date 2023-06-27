@@ -14,7 +14,7 @@ from flask import Flask, request, render_template
 from modules import common, database
 from modules import login
 
-__version__ = '0.0.1-alpha.1'
+__version__ = '0.0.1'
 
 os.environ['NO_PROXY'] = '*'
 
