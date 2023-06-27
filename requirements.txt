@@ -1,0 +1,5 @@
+configobj==5.0.8
+Flask==2.3.2
+peewee==3.16.2
+requests==2.31.0
+gunicorn==20.1.0
