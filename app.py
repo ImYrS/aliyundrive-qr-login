@@ -30,7 +30,7 @@ analytics = config['analytics']['content'] if config['analytics'].as_bool('enabl
 def init_logger(debug: Optional[bool] = False) -> NoReturn:
     """初始化日志系统"""
     log = logging.getLogger()
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
     log_format = logging.Formatter('%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
 
     ch = logging.StreamHandler()
