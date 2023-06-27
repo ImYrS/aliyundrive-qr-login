@@ -24,6 +24,8 @@ app.config['JSON_AS_ASCII'] = False
 config = ConfigObj('./config.ini', encoding='utf-8')
 debug_mode = config['dev'].as_bool('debug')
 
+analytics = config['analytics']['content'] if config['analytics'].as_bool('enable') else ''
+
 
 def init_logger(debug: Optional[bool] = False) -> NoReturn:
     """初始化日志系统"""
@@ -85,7 +87,7 @@ def options(path):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('index.html', analytics=analytics)
 
 
 @app.route('/api/login', methods=['POST'])
