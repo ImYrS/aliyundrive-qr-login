@@ -58,16 +58,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-center mb-4">
+                            <div class="text-center mb-3">
                                 <span class="text-muted text-sm" id="process-text"></span>
                                 <button class="btn btn-primary w-100" onclick="getLogin();" id="start-button">
                                     点击扫码登录
                                 </button>
                             </div>
-                            <p class="text-muted text-sm mb-n4">
-                                Powered By
-                                <a href="https://github.com/ImYrS/aliyun-auto-signin" target="_blank">
-                                    <i class="fab fa-github ms-1"></i> Aliyun Auto Signin
+                            <p class="text-sm mb-3">
+                                <a href="https://github.com/ImYrS/aliyundrive-qr-login" target="_blank" class="m-2">
+                                    <i class="fab fa-github me-1"></i> GitHub
+                                </a>
+                                |
+                                <a onclick="$('#privacy').modal('show');" href="#" class="m-2">
+                                    <i class="fas fa-user-lock me-1"></i> 关于隐私
+                                </a>
+                            </p>
+                            <p class="text-sm mb-n4">
+                                Powered by
+                                <a href="https://github.com/ImYrS/aliyun-auto-signin" target="_blank"
+                                   class="text-gradient text-primary text-bold">
+                                    Aliyun Auto Signin
                                 </a>
                             </p>
                         </div>
@@ -77,6 +87,45 @@
         </div>
     </div>
 </main>
+<div class="modal fade" id="privacy" tabindex="-1" role="dialog" aria-labelledby="privacy" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <div class="card card-plain">
+                    <div class="card-header pb-0 text-left">
+                        <h3 class="font-weight-bolder text-primary text-gradient">关于隐私</h3>
+                    </div>
+                    <div class="card-body pb-3">
+                        <h5>什么<span class="text-success">不会</span>被服务器保存</h5>
+                        <ul>
+                            <li>
+                                refresh token 以及任何阿里云盘账号相关数据
+                            </li>
+                            <li>
+                                任何可以用于识别你的信息
+                            </li>
+                        </ul>
+                        <h5>什么<span class="text-warning">会</span>被服务器保存</h5>
+                        <ul>
+                            <li>
+                                处理和识别登录请求的随机参数, 无法被用于识别用户和再次登录. 并定期清理.
+                            </li>
+                            <li>
+                                完全匿名的请求访问日志, 用于统计和分析当前页面的使用情况.
+                            </li>
+                        </ul>
+                        <h5>其他</h5>
+                        <p>
+                            你可以在 GitHub 查阅
+                            <a href="https://github.com/ImYrS/aliyundrive-qr-login" target="_blank">源代码</a>
+                            或自托管本项目.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.min.js"></script>
