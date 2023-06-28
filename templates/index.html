@@ -60,16 +60,19 @@
                             </div>
                             <div class="text-center mb-3">
                                 <span class="text-muted text-sm" id="process-text"></span>
-                                <button class="btn btn-primary w-100" onclick="getLogin();" id="start-button">
+                                <button class="btn btn-primary w-100" onclick="getLogin();" id="start-button"
+                                        data-umami-event="create-login-request">
                                     点击扫码登录
                                 </button>
                             </div>
                             <p class="text-sm mb-3">
-                                <a href="https://github.com/ImYrS/aliyundrive-qr-login" target="_blank" class="m-2">
+                                <a href="https://github.com/ImYrS/aliyundrive-qr-login" target="_blank" class="m-2"
+                                   data-umami-event="go-to-github">
                                     <i class="fab fa-github me-1"></i> GitHub
                                 </a>
                                 |
-                                <a onclick="$('#privacy').modal('show');" href="#" class="m-2">
+                                <a onclick="$('#privacy').modal('show');" href="#" class="m-2"
+                                   data-umami-event="check-out-privacy">
                                     <i class="fas fa-user-lock me-1"></i> 关于隐私
                                 </a>
                             </p>
@@ -193,6 +196,8 @@
                     $('#refresh-token').val(resp['data']['user']['refresh_token']);
                     $('#results').slideDown();
 
+                    if (umami) umami.track('log-in-success');
+
                 } else if (resp['data']['state'] === 30) {
                     slideUp = true;
                     text = '二维码已过期, <a href="javascript:getLogin()" class="text-decoration-underline">点击刷新</a>';
@@ -233,7 +238,6 @@
         });
     }
 
-    // getLogin();
     initClipboard();
 </script>
 </body>
