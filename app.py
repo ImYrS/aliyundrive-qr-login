@@ -14,7 +14,8 @@ from flask import Flask, request, render_template
 from modules import common, database
 from modules import login
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
+__commit__ = ''
 
 os.environ['NO_PROXY'] = '*'
 
@@ -54,10 +55,34 @@ def init_db() -> NoReturn:
     database.db.create_tables([database.LoginRequest])
 
 
-init_logger(debug_mode)
+def get_commit() -> Optional[str]:
+    """获取当前 commit"""
+    if not os.path.exists('.git'):
+        return None
 
-if not os.path.exists('./database.db'):
-    init_db()
+    commit = None
+
+    try:
+        with open('.git/refs/heads/main', 'r') as f:
+            commit = f.read().strip()[0:7]
+    except FileNotFoundError:
+        pass
+
+    return commit
+
+
+def init() -> NoReturn:
+    """初始化"""
+    init_logger(debug_mode)
+
+    if not os.path.exists('./database.db'):
+        init_db()
+
+    global __commit__
+    __commit__ = get_commit() or ''
+
+
+init()
 
 
 @app.after_request
@@ -87,7 +112,12 @@ def options(path):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html', analytics=analytics)
+    return render_template(
+        'index.html',
+        analytics=analytics,
+        version=__version__,
+        commit=__commit__,
+    )
 
 
 @app.route('/api/login', methods=['POST'])
