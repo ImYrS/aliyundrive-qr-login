@@ -11,7 +11,7 @@ import random
 import re
 import string
 import time
-from typing import NoReturn, Optional
+from typing import NoReturn, Optional, Iterable, Any
 
 
 def formatted_time(
@@ -259,3 +259,46 @@ def get_dir_size(path: str) -> int:
         for file in files:
             size += os.path.getsize(os.path.join(root, file))
     return size
+
+
+def get_real_ip(headers: Optional[Iterable[Any]] = None) -> str:
+    """
+    在使用了反向代理或 CDN 等情况下, 获取请求真实 IP
+
+    :param headers: 可迭代的请求头
+    :return: IP 或 127.0.0.1
+    """
+    probable_headers = [
+        'X-Forwarded-For',
+        'X-Real-IP',
+        'X-Forwarded',
+        'Forwarded-For',
+        'Forwarded',
+        'True-Client-IP',
+        'Client-IP',
+        'Ali-CDN-Real-Ip',
+        'Cdn-Src-Ip',
+        'Cdn-Real-Ip',
+        'Cf-Connecting-Ip',
+        'X-Cluster-Client-Ip',
+        'Wl-Proxy-Client-Ip',
+        'Proxy-Client-IP',
+        'True-Client-Ip',
+    ]
+
+    existed_headers = {}
+    for k, v in headers:
+        existed_headers[k.upper()] = v
+
+    for header in probable_headers:
+        if header.upper() in existed_headers:
+            ip = existed_headers[header.upper()]
+
+            # 可能存在多个 IP, 取第一个
+            return (
+                ip
+                if ',' not in ip
+                else ip.split(',')[0]
+            )
+
+    return '127.0.0.1'

@@ -10,17 +10,20 @@ from typing import NoReturn, Optional
 
 from configobj import ConfigObj
 from flask import Flask, request, render_template
+from flask_limiter import Limiter
 
 from modules import common, database
 from modules import login
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __commit__ = ''
 
 os.environ['NO_PROXY'] = '*'
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+
+limiter = Limiter(app=app, key_func=lambda: common.get_real_ip(request.headers))
 
 config = ConfigObj('./config.ini', encoding='utf-8')
 debug_mode = config['dev'].as_bool('debug')
@@ -110,7 +113,20 @@ def options(path):
     return path, 200
 
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    if 'application/json' in request.headers.get('Accept', ''):
+        return {
+            'code': 429,
+            'message': 'Too many requests: ' + str(e.description),
+            'message_human_readable': '请求过于频繁, 请稍后再试',
+        }, 429
+
+    return render_template('429.html', message=str(e.description)), 429
+
+
 @app.route('/', methods=['GET'])
+@limiter.limit('10/minute; 1/second')
 def index():
     return render_template(
         'index.html',
@@ -121,11 +137,13 @@ def index():
 
 
 @app.route('/api/login', methods=['POST'])
+@limiter.limit('1/5second')
 def create():
     return login.create_login_request()
 
 
 @app.route('/api/login', methods=['GET'])
+@limiter.limit('120/10minute; 60/minute; 1/second')
 def get():
     return login.get_login_request()
 

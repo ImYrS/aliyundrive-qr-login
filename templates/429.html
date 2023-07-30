@@ -1,0 +1,58 @@
+<!--
+=========================================================
+* Argon Dashboard 2 PRO - v2.0.1
+=========================================================
+
+* Product Page:  https://www.creative-tim.com/product/argon-dashboard-pro
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>429</title>
+    <link href="/static/css/argon-dashboard.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {{ analytics|safe }}
+</head>
+
+<body>
+<main class="main-content mt-0">
+    <div class="page-header min-vh-100">
+        <span class="mask bg-gradient-dark opacity-4"></span>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5 col-md-9">
+                    <div class="card" id="main-card">
+                        <div class="card-body px-lg-5 py-lg-5 text-center">
+                            <div class="text-center text-muted mb-3">
+                                <h2 class="mb-2">429 - 请求限制</h2>
+                                <span class="text-muted">由于请求速度超出限制, 当前访问已受到限制, 请稍后再试</span>
+                            </div>
+                            <p class="text-sm mb-3 text-bold">
+                                速率限制: {{ message }}
+                            </p>
+                            <p class="text-sm mb-n2 mb-lg-n4">
+                                Powered by
+                                <a href="https://aliyundrive.pro" target="_blank"
+                                   class="text-gradient text-primary text-bold" data-umami-event="click-powered-by">
+                                    AliyunDrive Pro
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+
+</html>
